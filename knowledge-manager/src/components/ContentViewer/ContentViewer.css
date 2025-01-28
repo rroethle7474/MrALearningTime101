@@ -1,0 +1,156 @@
+.content-viewer {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.content-header {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.content-metadata {
+  display: flex;
+  gap: 1rem;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.metadata-item {
+  padding-right: 1rem;
+  border-right: 1px solid #ddd;
+}
+
+.metadata-item:last-child {
+  border-right: none;
+}
+
+.source-link {
+  color: #1a1a1a;
+  text-decoration: none;
+}
+
+.source-link:hover {
+  text-decoration: underline;
+}
+
+.content-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab-button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tab-button.active {
+  color: #1a1a1a;
+  border-bottom-color: #1a1a1a;
+}
+
+.content-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+  min-height: 500px;
+}
+
+.content-sidebar {
+  border-right: 1px solid #ddd;
+  padding-right: 1rem;
+}
+
+.section-link {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #666;
+  border-radius: 4px;
+}
+
+.section-link:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.section-link.active {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1a1a1a;
+}
+
+.timestamp {
+  display: block;
+  font-size: 0.8rem;
+  color: #999;
+  margin-top: 0.25rem;
+}
+
+.content-section {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.content-section.active {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.section-content {
+  line-height: 1.6;
+  color: #333;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .source-link {
+    color: #fff;
+  }
+  
+  .tab-button.active {
+    color: #fff;
+    border-bottom-color: #fff;
+  }
+  
+  .section-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .section-link.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+  
+  .content-section.active {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .section-content {
+    color: #ccc;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .content-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .content-sidebar {
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+} 

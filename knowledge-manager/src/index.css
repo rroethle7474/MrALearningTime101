@@ -1,0 +1,46 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: #213547;
+  background-color: #ffffff;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #242424;
+  }
+  .type-button {
+    background: #1a1a1a;
+    border-color: #333;
+  }
+  .type-button.active {
+    background: #333;
+    border-color: #444;
+  }
+  input[type="url"] {
+    background: #1a1a1a;
+    border-color: #333;
+    color: white;
+  }
+  .submit-button {
+    background: #333;
+  }
+  .submit-button:hover {
+    background: #444;
+  }
+}
