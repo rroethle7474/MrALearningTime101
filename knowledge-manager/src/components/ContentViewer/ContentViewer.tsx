@@ -34,6 +34,11 @@ export function ContentViewer({
           {content.metadata.type === 'youtube' && content.metadata.duration && (
             <span className="metadata-item">Duration: {content.metadata.duration}</span>
           )}
+          {content.metadata.processedDate && (
+            <span className="metadata-item">
+              Processed: {new Date(content.metadata.processedDate).toLocaleDateString()}
+            </span>
+          )}
           <a 
             href={content.metadata.sourceUrl} 
             target="_blank" 
@@ -43,6 +48,13 @@ export function ContentViewer({
             View Source
           </a>
         </div>
+        
+        {content.metadata.summary && (
+          <div className="content-summary">
+            <h3>Summary</h3>
+            <p>{content.metadata.summary}</p>
+          </div>
+        )}
       </div>
 
       <div className="content-tabs">

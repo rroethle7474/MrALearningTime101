@@ -18,6 +18,7 @@ interface UseUrlSubmissionResult {
   tutorialContent: TutorialContent | null;
   canGenerateTutorial: boolean;
   contentId: string | null;
+  summary: string | null;
 }
 
 export function useUrlSubmission(): UseUrlSubmissionResult {
@@ -31,6 +32,7 @@ export function useUrlSubmission(): UseUrlSubmissionResult {
   const [tutorialContent, setTutorialContent] = useState<TutorialContent | null>(null);
   const [canGenerateTutorial, setCanGenerateTutorial] = useState(false);
   const [contentId, setContentId] = useState<string | null>(null);
+  const [summary, setSummary] = useState<string | null>(null);
 
   const pollTutorialStatus = async (tutorialTaskId: string): Promise<void> => {
     console.log('Starting tutorial status polling for:', tutorialTaskId);
@@ -79,8 +81,13 @@ export function useUrlSubmission(): UseUrlSubmissionResult {
       console.log('Content status response:', {
         status: status.status,
         content_id: status.content_id,
+        summary: status.summary,
         full_response: status
       });
+
+      if (status.summary) {
+        setSummary(status.summary);
+      }
 
       if (status.status === 'completed') {
         console.log('Content processing completed');
@@ -249,5 +256,6 @@ export function useUrlSubmission(): UseUrlSubmissionResult {
     tutorialContent,
     canGenerateTutorial,
     contentId,
+    summary,
   };
 }

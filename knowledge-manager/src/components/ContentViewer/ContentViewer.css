@@ -209,4 +209,23 @@
   .tutorial-empty {
     color: #ccc;
   }
+}
+
+.content-summary {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.content-summary h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.content-summary p {
+  margin: 0;
+  line-height: 1.5;
+  color: #666;
 } 

@@ -4,6 +4,9 @@ export interface ContentMetadata {
   duration?: string
   sourceUrl: string
   type: 'article' | 'youtube' | 'package-tree'
+  summary?: string
+  processedDate?: string
+  id?: string
 }
 
 export interface ContentSection {

@@ -9,6 +9,8 @@ interface APIResponse {
     source_url: string
     content_type: string
     duration?: string
+    summary?: string
+    processed_date?: string
   }
   chunks: string[]
 }
@@ -32,7 +34,9 @@ export const contentService = {
         author: response.metadata.author,
         sourceUrl: response.metadata.source_url,
         type: response.metadata.content_type as 'article' | 'youtube' | 'package-tree',
-        duration: response.metadata.duration
+        duration: response.metadata.duration,
+        summary: response.metadata.summary,
+        processedDate: response.metadata.processed_date
       },
       sections: response.chunks.map((chunk, index) => ({
         id: `section-${index}`,
