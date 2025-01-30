@@ -15,7 +15,12 @@ function App() {
     isProcessing,
     error,
     processingStatus,
-    processedContent
+    processedContent,
+    tutorialContent,
+    tutorialError,
+    isTutorialProcessing,
+    canGenerateTutorial,
+    generateTutorial
   } = useUrlSubmission();
 
   const getPlaceholderText = () => {
@@ -99,7 +104,14 @@ function App() {
         />
       </form>
 
-      {processedContent && <ContentViewer content={processedContent} />}
+      {processedContent && <ContentViewer
+        content={processedContent}
+        tutorial={tutorialContent}
+        tutorialError={tutorialError}
+        isTutorialProcessing={isTutorialProcessing}
+        canGenerateTutorial={canGenerateTutorial}
+        onGenerateTutorial={generateTutorial}
+      />}
     </div>
   )
 }

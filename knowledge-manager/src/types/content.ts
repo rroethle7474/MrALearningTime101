@@ -18,7 +18,9 @@ export interface ProcessedContent {
     title: string,
     author: string,
     sourceUrl: string,
-    type: 'article' | 'youtube' | 'package-tree'
+    type: 'article' | 'youtube' | 'package-tree',
+    duration?: string,
+    id?: string
   },
   sections: ContentSection[]
 } 

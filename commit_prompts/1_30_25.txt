@@ -1,0 +1,27 @@
+Perfect! Thanks! That exposed the tutorial generation was silently failing (which is a good thing since we want this to happen). Also, I see the retry tutorial generation button now.
+
+Looks like we are either passing the wrong content type id or my chroma db isn't storing it correctly.
+
+I've attached two examples. Can you review the frontend code an see if there is an issue with what we are passing for the content id?
+
+
+You nailed it! That's the issue. Looks like I need to update my python backend to send this back. Is the frontend able to handle this? Do you know how I can explain to my backend team to correct?
+
+I may have removed your great logging from earlier. The backend team has said they made the changes but I'm still not seeing the content id being returned after the content generation has been saved in ChromaDb. Can you help me add logging to see this?
+
+The updated content.py file they made the changes to are attached.
+
+Right now it's stopping at this point:
+  const generateTutorial = async () => {
+    console.log('Generating tutorial 2');
+    if (!processedContent || !contentId) return;
+
+
+Interesting. According to the logging on the backend, the content ID that I see in some of the console logs here do match.
+
+It appears that we are setting the contentId, but when the generateTutorial function goes to use it, it's not there.
+
+Any thoughts?
+
+
+

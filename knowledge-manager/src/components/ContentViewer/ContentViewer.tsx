@@ -1,14 +1,27 @@
 import { useState } from 'react'
 import { ProcessedContent } from '../../types/content'
+import { TutorialContent } from '../../types/tutorial'
 import './ContentViewer.css'
 import { TutorialView } from '../TutorialView/TutorialView'
 import { sampleTutorial } from '../../mocks/sampleTutorial'
 
 interface ContentViewerProps {
-  content: ProcessedContent
+  content: ProcessedContent;
+  tutorial: TutorialContent | null;
+  tutorialError: string | null;
+  isTutorialProcessing: boolean;
+  canGenerateTutorial: boolean;
+  onGenerateTutorial: () => void;
 }
 
-export function ContentViewer({ content }: ContentViewerProps) {
+export function ContentViewer({ 
+  content, 
+  tutorial,
+  tutorialError,
+  isTutorialProcessing,
+  canGenerateTutorial,
+  onGenerateTutorial 
+}: ContentViewerProps) {
   const [activeTab, setActiveTab] = useState<'content' | 'tutorial'>('content')
   const [activeSectionId, setActiveSectionId] = useState<string>(content.sections[0]?.id)
 
@@ -18,7 +31,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
         <h2>{content.metadata.title}</h2>
         <div className="content-metadata">
           <span className="metadata-item">By {content.metadata.author}</span>
-          {content.metadata.duration && (
+          {content.metadata.type === 'youtube' && content.metadata.duration && (
             <span className="metadata-item">Duration: {content.metadata.duration}</span>
           )}
           <a 
@@ -82,7 +95,39 @@ export function ContentViewer({ content }: ContentViewerProps) {
               ))}
             </div>
           ) : (
-            <TutorialView tutorial={sampleTutorial} />
+            <div className="tutorial-container">
+              {isTutorialProcessing ? (
+                <div className="tutorial-status">
+                  <span>Generating tutorial...</span>
+                </div>
+              ) : tutorialError ? (
+                <div className="tutorial-error">
+                  <p>{tutorialError}</p>
+                  {canGenerateTutorial && (
+                    <button 
+                      onClick={onGenerateTutorial}
+                      className="retry-button"
+                    >
+                      Retry Tutorial Generation
+                    </button>
+                  )}
+                </div>
+              ) : tutorial ? (
+                <TutorialView tutorial={tutorial} />
+              ) : (
+                <div className="tutorial-empty">
+                  <p>No tutorial available for this content.</p>
+                  {canGenerateTutorial && (
+                    <button 
+                      onClick={onGenerateTutorial}
+                      className="generate-button"
+                    >
+                      Generate Tutorial
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           )}
         </main>
       </div>

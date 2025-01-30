@@ -1,9 +1,13 @@
+import { ProcessedTutorial } from "../types/tutorial"
+
 export interface TaskResponse {
   task_id: string
   status: 'processing' | 'completed' | 'failed'
   message?: string
+  tutorial?: ProcessedTutorial
+  content_id?: string
 }
-
+  
 export interface SearchParams {
   query: string
   content_type: 'article' | 'youtube' | 'tutorial'
