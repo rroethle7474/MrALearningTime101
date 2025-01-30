@@ -2,17 +2,21 @@ import { useState } from 'react'
 import './App.css'
 import { ProcessingStatus } from './components/ProcessingStatus'
 import { ContentViewer } from './components/ContentViewer/ContentViewer'
-import { ProcessedContent } from './types/content'
-import { sampleContent } from './mocks/sampleContent'
+import { useUrlSubmission } from './hooks/useUrlSubmission'
 
 type InputType = 'article' | 'youtube' | 'package-tree'
 
 function App() {
   const [url, setUrl] = useState('')
   const [inputType, setInputType] = useState<InputType>('article')
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [processingStatus, setProcessingStatus] = useState<string>()
-  const [processedContent, setProcessedContent] = useState<ProcessedContent | null>(null)
+  
+  const {
+    submitUrl,
+    isProcessing,
+    error,
+    processingStatus,
+    processedContent
+  } = useUrlSubmission();
 
   const getPlaceholderText = () => {
     switch (inputType) {
@@ -26,39 +30,14 @@ function App() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsProcessing(true)
-    setProcessedContent(null)
-    
+    e.preventDefault();
     try {
-      setProcessingStatus('Validating URL...')
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      if (inputType === 'package-tree') {
-        setProcessingStatus('Analyzing site structure...')
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        
-        setProcessingStatus('Building knowledge tree...')
-        await new Promise(resolve => setTimeout(resolve, 2000))
-      } else {
-        setProcessingStatus('Extracting content...')
-        await new Promise(resolve => setTimeout(resolve, 2000))
+      await submitUrl(url, inputType as 'article' | 'youtube');
+      if (!error) {
+        setUrl('');
       }
-      
-      setProcessingStatus('Processing complete!')
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      // Simulate API response with sample content
-      setProcessedContent(sampleContent)
-      
-      // Reset form
-      setUrl('')
-      setProcessingStatus(undefined)
-    } catch (error: unknown) {
-      console.error('Processing error:', error);
-      setProcessingStatus('Error processing content')
-    } finally {
-      setIsProcessing(false)
+    } catch (err) {
+      console.error('Submission error:', err);
     }
   }
 

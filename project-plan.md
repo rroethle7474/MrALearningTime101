@@ -6,12 +6,10 @@ This document outlines the step-by-step implementation plan for building a knowl
 ## Technology Stack
 - Frontend: React with TypeScript
 - Backend: FastAPI
-- Cloud Provider: Microsoft Azure
-- Vector Search: Azure Cognitive Search
-- LLM Integration: Azure OpenAI Service via LangChain
-- Container Orchestration: Azure Container Apps
-- Message Queue: Azure Service Bus
-- Database: Azure SQL Database
+- Vector Store: ChromaDB
+- Embeddings: Sentence Transformers (all-MiniLM-L6-v2)
+- Content Extraction: Playwright (articles) & YouTube API (videos)
+- LLM Integration: Flexible architecture supporting multiple providers via LangChain
 
 ## Implementation Phases
 
@@ -19,14 +17,12 @@ This document outlines the step-by-step implementation plan for building a knowl
 **Goal**: Create a responsive React application for URL submission and content viewing
 
 #### Prerequisites
-- Azure account with appropriate subscriptions
 - Node.js and npm installed
-- Azure Static Web Apps CLI
+- Development environment configured
 
 #### Tasks
 1. Initialize React project with Vite and TypeScript
    ```bash
-   use react and typescript for template
    npm create vite@latest knowledge-manager -- --template react-ts
    cd knowledge-manager
    npm install
@@ -34,7 +30,7 @@ This document outlines the step-by-step implementation plan for building a knowl
 
 2. Set up key dependencies
    ```bash
-   npm install @azure/identity @azure/storage-blob @microsoft/fetch-event-source
+   npm install @microsoft/fetch-event-source
    npm install @mui/material @emotion/react @emotion/styled   # Updated Material-UI packages
    ```
 
@@ -70,7 +66,7 @@ This document outlines the step-by-step implementation plan for building a knowl
    }
    ```
 
-4. Configure Vite for Azure deployment
+4. Configure Vite
    ```typescript
    // vite.config.ts
    import { defineConfig } from 'vite'
@@ -88,40 +84,11 @@ This document outlines the step-by-step implementation plan for building a knowl
    })
    ```
 
-3. Implement core components:
+5. Implement core components:
    - URL submission form
    - Processing status indicator
    - Content viewer
    - Tutorial/summary viewer
-
-4. Create Azure Static Web App with Vite configuration
-   ```bash
-   # Create the static web app
-   az staticwebapp create --name knowledge-manager --resource-group knowledge-manager-rg --location "East US 2"
-
-   # Add staticwebapp.config.json in your project root
-   {
-     "routes": [
-       {
-         "route": "/assets/*",
-         "headers": {
-           "cache-control": "must-revalidate, max-age=31536000"
-         }
-       },
-       {
-         "route": "/*",
-         "serve": "/index.html",
-         "statusCode": 200
-       }
-     ],
-     "navigationFallback": {
-       "rewrite": "/index.html"
-     },
-     "buildProperties": {
-       "outputLocation": "dist"
-     }
-   }
-   ```
 
 #### Development Scripts
 Add these scripts to your package.json:
@@ -144,16 +111,17 @@ Add these scripts to your package.json:
 
 #### Expected Deliverables
 - Functional React application
-- Azure Static Web App deployment
+- Local development setup
 - Basic UI/UX implementation
 
 ### Phase 2: Backend API Development
-**Goal**: Implement FastAPI backend with Azure Functions integration
+**Goal**: Implement FastAPI backend with ChromaDB integration and flexible LLM support
 
 #### Prerequisites
 - Python 3.9+
-- Azure Functions Core Tools
-- Azure CLI
+- Node.js (for Playwright)
+- YouTube API credentials
+- LLM API keys (for chosen providers)
 
 #### Tasks
 1. Initialize FastAPI project
@@ -161,97 +129,114 @@ Add these scripts to your package.json:
    mkdir knowledge-manager-api
    cd knowledge-manager-api
    python -m venv venv
-   pip install fastapi azure-functions azure-storage-blob langchain
+   pip install fastapi uvicorn chromadb sentence-transformers playwright youtube-transcript-api langchain python-dotenv
    ```
 
 2. Set up core API endpoints:
-   - URL submission
+   - URL submission (separate endpoints for articles and YouTube)
    - Content processing status
-   - Search functionality
+   - Semantic search functionality
+   - Tutorial retrieval
    - Summary retrieval
 
-3. Create Azure Function App
-   ```bash
-   az functionapp create --name knowledge-manager-api --resource-group knowledge-manager-rg --runtime python
+3. Initialize ChromaDB and collections
+   ```python
+   # Example collection setup
+   client = chromadb.Client()
+   articles = client.create_collection("articles_content")
+   videos = client.create_collection("youtube_content")
+   tutorials = client.create_collection("tutorials")
    ```
 
-4. Implement Azure OpenAI Service integration
-   ```bash
-   az cognitiveservices account create --name knowledge-manager-ai --resource-group knowledge-manager-rg --kind OpenAI
+4. Configure Sentence Transformers
+   ```python
+   # Example embeddings setup
+   from sentence_transformers import SentenceTransformer
+   model = SentenceTransformer('all-MiniLM-L6-v2')
    ```
 
 #### Expected Deliverables
-- FastAPI application with Azure Functions
+- FastAPI application with ChromaDB integration
 - API documentation (Swagger/OpenAPI)
 - Integration tests
-- Deployment scripts
+- Local development setup scripts
 
 ### Phase 3: Content Processing Pipeline
 **Goal**: Implement robust content extraction and processing system
 
 #### Prerequisites
-- Azure Container Registry access
-- Docker installed locally
-- Azure Container Apps environment
+- Playwright installed and configured
+- YouTube API credentials
+- Python environment setup
 
 #### Tasks
 1. Create content extraction services:
-   - YouTube transcript extractor
-   - Web content scraper (with Playwright)
-   - Dynamic content handler
+   - YouTube transcript extractor using official API
+   - Web content scraper with Playwright
+   - Content processor for different formats
 
-2. Set up Azure Container Apps
-   ```bash
-   az containerapp create --name content-processor --resource-group knowledge-manager-rg --environment content-env
+2. Implement background processing with FastAPI:
+   ```python
+   from fastapi import BackgroundTasks
+   
+   @app.post("/submit-url")
+   async def submit_url(url: str, background_tasks: BackgroundTasks):
+       task_id = generate_task_id()
+       background_tasks.add_task(process_content, url, task_id)
+       return {"task_id": task_id}
    ```
 
 3. Implement processing pipeline:
    - Content type detection
-   - Text extraction
+   - Text extraction and cleaning
    - Chunking and preprocessing
-   - Embedding generation
-   - Summary creation
-
-4. Configure Azure Service Bus
-   ```bash
-   az servicebus namespace create --name knowledge-manager-bus --resource-group knowledge-manager-rg
-   ```
+   - Embedding generation with Sentence Transformers
+   - Summary and tutorial generation with LLM
+   - Storage in ChromaDB
 
 #### Expected Deliverables
-- Containerized processing services
-- Message queue implementation
+- Content extraction services
+- Background processing implementation
 - Processing status tracking
 - Error handling and retry logic
 
 ### Phase 4: Vector Search Implementation
-**Goal**: Set up Azure Cognitive Search with vector capabilities
+**Goal**: Set up ChromaDB with semantic search capabilities
 
 #### Prerequisites
-- Azure Cognitive Search service
-- Azure SQL Database
+- ChromaDB installed and configured
+- Sentence Transformers model downloaded
 
 #### Tasks
-1. Create Azure Cognitive Search service
-   ```bash
-   az search service create --name knowledge-manager-search --resource-group knowledge-manager-rg --sku Standard
+1. Initialize ChromaDB collections
+   ```python
+   from chromadb.config import Settings
+   
+   client = chromadb.Client(Settings(
+       chroma_db_impl="duckdb+parquet",
+       persist_directory="./chromadb"
+   ))
    ```
 
-2. Set up Azure SQL Database
-   ```bash
-   az sql db create --name knowledge-manager-db --resource-group knowledge-manager-rg --server knowledge-manager-sql
+2. Implement embedding generation
+   ```python
+   from sentence_transformers import SentenceTransformer
+   
+   model = SentenceTransformer('all-MiniLM-L6-v2')
+   embeddings = model.encode(texts)
    ```
 
 3. Implement search functionality:
-   - Vector indexing
-   - Metadata storage
+   - Semantic search using embeddings
+   - Metadata filtering
    - Search API integration
-   - Results ranking
+   - Results ranking and scoring
 
 #### Expected Deliverables
 - Vector search implementation
-- Database schema
 - Search API documentation
 - Performance metrics
+- Optimization guidelines
 
 ### Phase 5: Integration and Testing
 **Goal**: Ensure all components work together seamlessly
@@ -266,37 +251,30 @@ Add these scripts to your package.json:
 - Integration test suite
 - Performance test results
 - Security audit report
-- Monitoring dashboards
+- Monitoring setup
 
 ## Getting Started
 
-For each phase, you'll need:
+1. Set up development environment:
+   - Install Python 3.9+
+   - Install Node.js and npm
+   - Configure virtual environment
 
-1. Azure Subscription ID
-2. Resource Group creation:
+2. Configure environment variables:
    ```bash
-   az group create --name knowledge-manager-rg --location eastus2
-   ```
-
-3. Service Principal for deployments:
-   ```bash
-   az ad sp create-for-rbac --name knowledge-manager-sp --role contributor
-   ```
-
-4. Environment Variables:
-   ```bash
-   AZURE_SUBSCRIPTION_ID=<your-subscription-id>
-   AZURE_TENANT_ID=<your-tenant-id>
-   AZURE_CLIENT_ID=<your-client-id>
-   AZURE_CLIENT_SECRET=<your-client-secret>
+   YOUTUBE_API_KEY=<your-youtube-api-key>
+   OPENAI_API_KEY=<your-openai-api-key>  # If using OpenAI
+   ANTHROPIC_API_KEY=<your-anthropic-key>  # If using Claude
    ```
 
 ## Support Information
 
-- Azure Documentation: https://docs.microsoft.com/azure
 - FastAPI Documentation: https://fastapi.tiangolo.com/
 - React Documentation: https://reactjs.org/docs
+- ChromaDB Documentation: https://docs.trychroma.com/
 - LangChain Documentation: https://python.langchain.com/docs
+- Sentence Transformers Documentation: https://www.sbert.net/
+- YouTube API Documentation: https://developers.google.com/youtube/v3
 
 ## Next Steps
 To begin implementation, start with Phase 1: Frontend Development. Each phase builds upon the previous one, so completing them in order is recommended.

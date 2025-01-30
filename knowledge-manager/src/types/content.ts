@@ -14,6 +14,11 @@ export interface ContentSection {
 }
 
 export interface ProcessedContent {
-  metadata: ContentMetadata
+  metadata: {
+    title: string,
+    author: string,
+    sourceUrl: string,
+    type: 'article' | 'youtube' | 'package-tree'
+  },
   sections: ContentSection[]
 } 
