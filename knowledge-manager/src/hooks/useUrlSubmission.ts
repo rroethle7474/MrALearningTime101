@@ -4,6 +4,7 @@ import { ProcessedContent } from '../types/content';
 import { TutorialContent } from '../types/tutorial';
 import { contentService } from '../services/content.service';
 import { tutorialService } from '../services/tutorial.service';
+import { collectionService } from '../services/collection.service';
 
 interface UseUrlSubmissionResult {
   submitUrl: (url: string, type: 'article' | 'youtube') => Promise<void>;
@@ -160,7 +161,19 @@ export function useUrlSubmission(): UseUrlSubmissionResult {
     setCanGenerateTutorial(false);
     
     try {
-      const submission: URLSubmissionRequest = { url, content_type: type };
+      const safe_url = url.trim().toLowerCase();
+      const collectionName = type === 'youtube' ? 'youtube_content' : 'articles_content';
+      
+      // Check if content already exists
+      const existingContent = await collectionService.checkContentExists(collectionName, safe_url);
+      
+      if (existingContent?.exists) {
+        console.log('Content already exists, deleting before reprocessing:', existingContent.content_id);
+        await collectionService.deleteContent(collectionName, existingContent.content_id);
+      }
+
+      // Continue with normal submission process
+      const submission: URLSubmissionRequest = { url: safe_url, content_type: type };
       console.log('Submitting content:', submission);
       const response = await contentService.submitContent(submission);
       console.log('Submit content response:', response);

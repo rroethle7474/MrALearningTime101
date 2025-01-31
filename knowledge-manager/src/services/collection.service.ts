@@ -24,5 +24,17 @@ export const collectionService = {
 
   async deleteContent(collectionName: string, contentId: string): Promise<boolean> {
     return api.delete(`search/content/${collectionName}/${contentId}`);
+  },
+
+  async checkContentExists(collectionName: string, sourceUrl: string): Promise<{ exists: boolean; content_id: string } | null> {
+    try {
+      const encodedUrl = encodeURIComponent(sourceUrl);
+      return api.get(`content/${collectionName}/by-url`, { source_url: encodedUrl });
+    } catch (error) {
+      if ((error as any)?.status === 404) {
+        return null;
+      }
+      throw error;
+    }
   }
 };
