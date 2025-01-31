@@ -69,7 +69,7 @@ export function useUrlSubmission(): UseUrlSubmissionResult {
 
   const pollProcessingStatus = async (contentTaskId: string): Promise<TaskResponse> => {
     console.log('Starting content processing polling for:', contentTaskId);
-    const maxAttempts = 30;
+    const maxAttempts = 60;
     let attempts = 0;
 
     const poll = async (): Promise<TaskResponse> => {
@@ -165,6 +165,7 @@ export function useUrlSubmission(): UseUrlSubmissionResult {
       const collectionName = type === 'youtube' ? 'youtube_content' : 'articles_content';
       
       // Check if content already exists
+      console.log("SAFE_URL", safe_url);
       const existingContent = await collectionService.checkContentExists(collectionName, safe_url);
       
       if (existingContent?.exists) {

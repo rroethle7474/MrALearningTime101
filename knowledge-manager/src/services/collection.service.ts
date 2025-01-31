@@ -3,8 +3,8 @@ import { MultiCollectionContentResponse } from '../types/collection';
 import { ContentDetailResponse } from '../types/content-detail';
 
 const CONTENT_COLLECTIONS = [
-  'articles_content',
-  'youtube_content'
+  'articles',
+  'youtube'
 ];
 
 export const collectionService = {
@@ -28,8 +28,7 @@ export const collectionService = {
 
   async checkContentExists(collectionName: string, sourceUrl: string): Promise<{ exists: boolean; content_id: string } | null> {
     try {
-      const encodedUrl = encodeURIComponent(sourceUrl);
-      return api.get(`content/${collectionName}/by-url`, { source_url: encodedUrl });
+      return api.get(`search/content/${collectionName}/by-url`, { source_url: sourceUrl });
     } catch (error) {
       if ((error as any)?.status === 404) {
         return null;
