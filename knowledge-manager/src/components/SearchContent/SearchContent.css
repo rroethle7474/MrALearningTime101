@@ -1,0 +1,134 @@
+.search-input {
+    width: 100%;
+    min-height: 120px;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    resize: vertical;
+    font-family: inherit;
+    margin-bottom: 1rem;
+  }
+  
+  .collection-select {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .collection-select label {
+    font-size: 1rem;
+    color: #666;
+    min-width: 80px;
+  }
+  
+  .collection-dropdown {
+    flex: 1;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    background: #fff;
+    cursor: pointer;
+  }
+  
+  .search-results {
+    margin-top: 2rem;
+  }
+  
+  .result-item {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .result-type {
+    font-size: 0.9rem;
+    color: #666;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+  }
+  
+  .result-content {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+  
+  .result-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #888;
+  }
+  
+  .result-score {
+    color: #666;
+  }
+  
+  .error-message {
+    padding: 1rem;
+    background: #ffebee;
+    color: #c62828;
+    border-radius: 4px;
+    margin: 1rem auto;
+    max-width: 500px;
+  }
+  
+  .no-results {
+    text-align: center;
+    color: #666;
+    padding: 2rem 0;
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .search-input,
+    .collection-dropdown {
+      background: #1a1a1a;
+      border-color: #333;
+      color: white;
+    }
+  
+    .collection-select label {
+      color: #ccc;
+    }
+  
+    .result-item {
+      border-color: #333;
+      background: rgba(255, 255, 255, 0.02);
+    }
+  
+    .result-type {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ccc;
+    }
+  
+    .result-content {
+      color: #ccc;
+    }
+  
+    .result-footer,
+    .result-score {
+      color: #888;
+    }
+  
+    .error-message {
+      background: rgba(198, 40, 40, 0.1);
+      color: #ff8a80;
+    }
+  
+    .no-results {
+      color: #888;
+    }
+  }

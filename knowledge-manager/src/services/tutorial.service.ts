@@ -1,6 +1,7 @@
 import { api } from '../api/client'
 import { ProcessedTutorial, TutorialContent } from '../types/tutorial'
 import { TaskResponse } from './types'
+import { TutorialListResponse, TutorialResponse } from '../types/tutorial-list'
 
 interface TutorialGenerationRequest {
   content_id: string;
@@ -69,5 +70,16 @@ export const tutorialService = {
       practiceExercises,
       additionalNotes: additionalNotes.length > 0 ? additionalNotes : undefined
     };
+  },
+
+  async getTutorialsList(offset: number = 0, limit: number = 50): Promise<TutorialListResponse> {
+    return api.get<TutorialListResponse>('tutorials', {
+      offset: offset.toString(),
+      limit: limit.toString()
+    });
+  },
+
+  async getTutorialDetail(tutorialId: string): Promise<TutorialResponse> {
+    return api.get<TutorialResponse>(`tutorials/${tutorialId}`);
   }
 } 

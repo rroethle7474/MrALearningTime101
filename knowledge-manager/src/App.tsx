@@ -1,8 +1,13 @@
 import { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css'
 import { ProcessingStatus } from './components/ProcessingStatus'
 import { ContentViewer } from './components/ContentViewer/ContentViewer'
 import { useUrlSubmission } from './hooks/useUrlSubmission'
+import SearchContent from './components/SearchContent/SearchContent';
+import ExploreContent from './components/ExploreContent/ExploreContent';
+import PromptContent from './components/PromptContent/PromptContent';
+import ExploreTutorial from './components/ExploreTutorial/ExploreTutorial';
 
 type InputType = 'article' | 'youtube' | 'package-tree'
 
@@ -47,72 +52,92 @@ function App() {
   }
 
   return (
-    <div className="container">
-      <h1>Knowledge Manager</h1>
-      <p className="description">
-        Submit a URL to process and store articles, videos, or build knowledge trees
-      </p>
+    <Router>
+      <div className="app">
+        <nav className="navigation">
+          <Link to="/" className="nav-link">Home</Link>
+          <Link to="/search" className="nav-link">Search Content</Link>
+          <Link to="/explore" className="nav-link">Explore</Link>
+          <Link to="/explore-tutorial" className="nav-link">Explore Tutorial</Link>
+          <Link to="/prompt" className="nav-link">Prompt</Link>
+        </nav>
 
-      <form onSubmit={handleSubmit} className="input-form">
-        <div className="input-type-selector">
-          <button
-            type="button"
-            className={`type-button ${inputType === 'article' ? 'active' : ''}`}
-            onClick={() => setInputType('article')}
-            disabled={isProcessing}
-          >
-            Article
-          </button>
-          <button
-            type="button"
-            className={`type-button ${inputType === 'youtube' ? 'active' : ''}`}
-            onClick={() => setInputType('youtube')}
-            disabled={isProcessing}
-          >
-            YouTube
-          </button>
-          <button
-            type="button"
-            className={`type-button ${inputType === 'package-tree' ? 'active' : ''}`}
-            onClick={() => setInputType('package-tree')}
-            disabled={isProcessing}
-          >
-            Package Tree
-          </button>
-        </div>
+      <Routes>
+          <Route path="/search" element={<SearchContent />} />
+          <Route path="/explore" element={<ExploreContent />} />
+          <Route path="/explore-tutorial" element={<ExploreTutorial />} />
+          <Route path="/prompt" element={<PromptContent />} />
+          <Route path="/" element={
+            <div className="container">
+              <h1>Knowledge Manager</h1>
+              <p className="description">
+                Submit a URL to process and store articles, videos, or build knowledge trees
+              </p>
 
-        <input
-          type="url"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder={getPlaceholderText()}
-          required
-          disabled={isProcessing}
-        />
+              <form onSubmit={handleSubmit} className="input-form">
+                <div className="input-type-selector">
+                  <button
+                    type="button"
+                    className={`type-button ${inputType === 'article' ? 'active' : ''}`}
+                    onClick={() => setInputType('article')}
+                    disabled={isProcessing}
+                  >
+                    Article
+                  </button>
+                  <button
+                    type="button"
+                    className={`type-button ${inputType === 'youtube' ? 'active' : ''}`}
+                    onClick={() => setInputType('youtube')}
+                    disabled={isProcessing}
+                  >
+                    YouTube
+                  </button>
+                  <button
+                    type="button"
+                    className={`type-button ${inputType === 'package-tree' ? 'active' : ''}`}
+                    onClick={() => setInputType('package-tree')}
+                    disabled={isProcessing}
+                  >
+                    Package Tree
+                  </button>
+                </div>
 
-        <button 
-          type="submit" 
-          className="submit-button"
-          disabled={isProcessing}
-        >
-          {isProcessing ? 'Processing...' : 'Process Content'}
-        </button>
+                <input
+                  type="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder={getPlaceholderText()}
+                  required
+                  disabled={isProcessing}
+                />
 
-        <ProcessingStatus 
-          isProcessing={isProcessing}
-          status={processingStatus}
-        />
-      </form>
+                <button 
+                  type="submit" 
+                  className="submit-button"
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? 'Processing...' : 'Process Content'}
+                </button>
 
-      {processedContent && <ContentViewer
-        content={processedContent}
-        tutorial={tutorialContent}
-        tutorialError={tutorialError}
-        isTutorialProcessing={isTutorialProcessing}
-        canGenerateTutorial={canGenerateTutorial}
-        onGenerateTutorial={generateTutorial}
-      />}
-    </div>
+                <ProcessingStatus 
+                  isProcessing={isProcessing}
+                  status={processingStatus}
+                />
+              </form>
+
+              {processedContent && <ContentViewer
+                content={processedContent}
+                tutorial={tutorialContent}
+                tutorialError={tutorialError}
+                isTutorialProcessing={isTutorialProcessing}
+                canGenerateTutorial={canGenerateTutorial}
+                onGenerateTutorial={generateTutorial}
+              />} 
+            </div>
+          } />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 
