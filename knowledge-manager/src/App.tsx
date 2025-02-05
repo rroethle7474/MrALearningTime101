@@ -9,7 +9,7 @@ import ExploreContent from './components/ExploreContent/ExploreContent';
 import PromptContent from './components/PromptContent/PromptContent';
 import ExploreTutorial from './components/ExploreTutorial/ExploreTutorial';
 
-type InputType = 'article' | 'youtube' | 'package-tree'
+type InputType = 'article' | 'youtube' | 'package-tree' | 'tiktok'
 
 function App() {
   const [url, setUrl] = useState('')
@@ -36,6 +36,8 @@ function App() {
         return 'Enter YouTube video URL'
       case 'package-tree':
         return 'Enter root URL to build knowledge tree'
+      case 'tiktok':
+        return 'Enter TikTok video URL'
     }
   }
 
@@ -91,6 +93,14 @@ function App() {
                     disabled={isProcessing}
                   >
                     YouTube
+                  </button>
+                  <button
+                    type="button"
+                    className={`type-button ${inputType === 'tiktok' ? 'active' : ''}`}
+                    onClick={() => setInputType('tiktok')}
+                    disabled={isProcessing}
+                  >
+                    TikTok
                   </button>
                   <button
                     type="button"

@@ -97,10 +97,17 @@
   margin-top: 0.25rem;
 }
 
+.content-main {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-right: 1rem;
+}
+
 .content-section {
   margin-bottom: 2rem;
   padding: 1rem;
   border-radius: 4px;
+  scroll-margin-top: 1rem;
 }
 
 .content-section.active {
@@ -228,4 +235,52 @@
   margin: 0;
   line-height: 1.5;
   color: #666;
+}
+
+.back-to-top-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.back-to-top-button:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .back-to-top-button {
+    background: #333;
+    color: #fff;
+  }
+
+  .back-to-top-button:hover {
+    background: #444;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .back-to-top-button {
+    bottom: 1rem;
+    right: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.2rem;
+  }
 } 

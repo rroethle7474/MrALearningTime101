@@ -161,11 +161,10 @@ export function useUrlSubmission(): UseUrlSubmissionResult {
     setCanGenerateTutorial(false);
     
     try {
-      const safe_url = url.trim().toLowerCase();
+      const safe_url = url.trim();
       const collectionName = type === 'youtube' ? 'youtube_content' : 'articles_content';
       
       // Check if content already exists
-      console.log("SAFE_URL", safe_url);
       const existingContent = await collectionService.checkContentExists(collectionName, safe_url);
       
       if (existingContent?.exists) {

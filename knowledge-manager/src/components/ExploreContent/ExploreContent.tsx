@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { collectionService } from '../../services/collection.service';
 import { ContentListItem, GridItem, ContentType } from '../../types/collection';
 import { ContentDetailResponse } from '../../types/content-detail';
@@ -19,10 +19,22 @@ const ExploreContent = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const PAGE_SIZE = 50;
 
+  // Use useRef to track if initial load has happened
+  const initialLoadComplete = useRef(false);
+
+  // Remove loadMoreItems from dependencies by using useRef for state values
+  const stateRef = useRef({ offset, loading, hasMore });
+  
+  // Update ref when state changes
+  useEffect(() => {
+    stateRef.current = { offset, loading, hasMore };
+  }, [offset, loading, hasMore]);
+
   // Transform collection items to grid items
   const transformItems = (items: ContentListItem[]): GridItem[] => {
     return items.map(item => ({
       id: item.id,
+      key: `${item.metadata.content_type}-${item.id}`,
       title: item.title,
       type: item.metadata.content_type,
       sourceUrl: item.metadata.source_url,
@@ -34,23 +46,22 @@ const ExploreContent = () => {
   };
 
   const loadMoreItems = useCallback(async () => {
+    const { loading, hasMore } = stateRef.current;
     if (loading || !hasMore) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      const response = await collectionService.getCollectionsContent(offset, PAGE_SIZE);
+      const response = await collectionService.getCollectionsContent(stateRef.current.offset, PAGE_SIZE);
       
-      // Combine items from both collections
       const newItems = Object.values(response.collections)
         .flatMap(collection => transformItems(collection.items));
 
-      // Calculate total items across both collections
       const totalItems = Object.values(response.collections)
         .reduce((acc, collection) => acc + collection.total, 0);
       
-      setHasMore(offset + PAGE_SIZE < totalItems);
+      setHasMore(stateRef.current.offset + PAGE_SIZE < totalItems);
       setOffset(prev => prev + PAGE_SIZE);
       setGridItems(prev => [...prev, ...newItems]);
     } catch (err) {
@@ -59,15 +70,28 @@ const ExploreContent = () => {
     } finally {
       setLoading(false);
     }
-  }, [offset, loading, hasMore]);
+  }, []); // No dependencies needed anymore
 
   // Initial load
   useEffect(() => {
-    loadMoreItems();
+    if (!initialLoadComplete.current) {
+      initialLoadComplete.current = true;
+      loadMoreItems();
+    }
+  }, []); // Empty dependency array since we're using ref
+
+  // Intersection Observer setup
+  const observer = useRef<IntersectionObserver>();
+
+  // Add separate cleanup effect
+  useEffect(() => {
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
   }, []);
 
-  // Intersection Observer for infinite scroll
-  const observer = React.useRef<IntersectionObserver>();
   const lastItemRef = useCallback((node: HTMLTableRowElement) => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
@@ -86,7 +110,11 @@ const ExploreContent = () => {
     setModalError(null);
     
     try {
-      const collectionName = type === 'youtube' ? 'youtube_content' : 'articles_content';
+      const collectionName = type === 'youtube' 
+        ? 'youtube_content' 
+        : type === 'tiktok'
+          ? 'tiktok_content'
+          : 'articles_content';
       const contentDetail = await collectionService.getContentDetail(collectionName, id);
       setSelectedContent(contentDetail);
     } catch (err) {
@@ -131,7 +159,14 @@ const ExploreContent = () => {
   };
 
   const getTypeDisplay = (type: ContentType) => {
-    return type === 'youtube' ? 'YouTube' : 'Article';
+    switch (type) {
+      case 'youtube':
+        return 'YouTube';
+      case 'tiktok':
+        return 'TikTok';
+      default:
+        return 'Article';
+    }
   };
 
   return (
@@ -167,7 +202,7 @@ const ExploreContent = () => {
             ) : (
               gridItems.map((item, index) => (
                 <tr 
-                  key={item.id}
+                  key={item.key}
                   ref={index === gridItems.length - 1 ? lastItemRef : undefined}
                   className="grid-row"
                 >
@@ -195,7 +230,7 @@ const ExploreContent = () => {
                 </button>
                     <button 
                       className="action-button delete-button"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => handleDelete(item)}
                     >
                       Delete
                     </button>

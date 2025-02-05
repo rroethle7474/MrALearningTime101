@@ -19,6 +19,12 @@ async function handleResponse(response: Response) {
     const error = await response.json().catch(() => ({ message: 'An unknown error occurred' }))
     throw new ApiError(response.status, error.message)
   }
+  
+  // Return undefined for 204 No Content responses
+  if (response.status === 204) {
+    return undefined
+  }
+  
   return response.json()
 }
 
@@ -73,7 +79,7 @@ export const api = {
     return apiRequest(endpoint, { method: 'PUT', body: data })
   },
 
-  delete: <T>(endpoint: string): Promise<T> => {
+  delete: <T = void>(endpoint: string): Promise<T> => {
     return apiRequest(endpoint, { method: 'DELETE' })
   },
 }

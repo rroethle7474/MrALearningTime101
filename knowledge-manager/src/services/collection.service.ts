@@ -3,8 +3,8 @@ import { MultiCollectionContentResponse } from '../types/collection';
 import { ContentDetailResponse } from '../types/content-detail';
 
 const CONTENT_COLLECTIONS = [
-  'articles',
-  'youtube'
+  'articles_content',
+  'youtube_content'
 ];
 
 export const collectionService = {
@@ -22,8 +22,8 @@ export const collectionService = {
     return api.get<ContentDetailResponse>(`search/content/${collectionName}/${contentId}`);
   },
 
-  async deleteContent(collectionName: string, contentId: string): Promise<boolean> {
-    return api.delete(`search/content/${collectionName}/${contentId}`);
+  async deleteContent(collectionName: string, contentId: string): Promise<void> {
+    await api.delete(`search/content/${collectionName}/${contentId}`);
   },
 
   async checkContentExists(collectionName: string, sourceUrl: string): Promise<{ exists: boolean; content_id: string } | null> {

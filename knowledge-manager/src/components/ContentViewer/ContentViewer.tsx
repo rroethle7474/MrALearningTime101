@@ -1,9 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ProcessedContent } from '../../types/content'
 import { TutorialContent } from '../../types/tutorial'
 import './ContentViewer.css'
 import { TutorialView } from '../TutorialView/TutorialView'
-import { sampleTutorial } from '../../mocks/sampleTutorial'
 
 interface ContentViewerProps {
   content: ProcessedContent;
@@ -13,6 +12,15 @@ interface ContentViewerProps {
   canGenerateTutorial: boolean;
   onGenerateTutorial: () => void;
 }
+
+// Add this constant for tutorial sections
+const TUTORIAL_SECTIONS = [
+  { id: 'summary', title: 'Summary' },
+  { id: 'key-points', title: 'Key Points' },
+  { id: 'code-examples', title: 'Code Examples' },
+  { id: 'practice-examples', title: 'Practice Examples' },
+  { id: 'additional-notes', title: 'Additional Notes' }
+];
 
 export function ContentViewer({ 
   content, 
@@ -24,6 +32,38 @@ export function ContentViewer({
 }: ContentViewerProps) {
   const [activeTab, setActiveTab] = useState<'content' | 'tutorial'>('content')
   const [activeSectionId, setActiveSectionId] = useState<string>(content.sections[0]?.id)
+  const [showBackToTop, setShowBackToTop] = useState(false)
+
+  // Reset active section when switching tabs
+  useEffect(() => {
+    if (activeTab === 'content') {
+      setActiveSectionId(content.sections[0]?.id)
+    } else {
+      setActiveSectionId(TUTORIAL_SECTIONS[0].id)
+    }
+  }, [activeTab, content.sections])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show button when user scrolls down 300px
+      setShowBackToTop(window.scrollY > 300)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const scrollToSection = (sectionId: string) => {
+    setActiveSectionId(sectionId)
+    const element = document.getElementById(sectionId)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
 
   return (
     <div className="content-viewer">
@@ -74,18 +114,32 @@ export function ContentViewer({
 
       <div className="content-layout">
         <nav className="content-sidebar">
-          {content.sections.map(section => (
-            <button
-              key={section.id}
-              className={`section-link ${section.id === activeSectionId ? 'active' : ''}`}
-              onClick={() => setActiveSectionId(section.id)}
-            >
-              {section.title}
-              {section.timestamp && (
-                <span className="timestamp">{section.timestamp}</span>
-              )}
-            </button>
-          ))}
+          {activeTab === 'content' ? (
+            // Content sections
+            content.sections.map(section => (
+              <button
+                key={section.id}
+                className={`section-link ${section.id === activeSectionId ? 'active' : ''}`}
+                onClick={() => scrollToSection(section.id)}
+              >
+                {section.title}
+                {section.timestamp && (
+                  <span className="timestamp">{section.timestamp}</span>
+                )}
+              </button>
+            ))
+          ) : (
+            // Tutorial sections
+            TUTORIAL_SECTIONS.map(section => (
+              <button
+                key={section.id}
+                className={`section-link ${section.id === activeSectionId ? 'active' : ''}`}
+                onClick={() => scrollToSection(section.id)}
+              >
+                {section.title}
+              </button>
+            ))
+          )}
         </nav>
 
         <main className="content-main">
@@ -143,6 +197,16 @@ export function ContentViewer({
           )}
         </main>
       </div>
+
+      {showBackToTop && (
+        <button 
+          className="back-to-top-button"
+          onClick={scrollToTop}
+          aria-label="Back to top"
+        >
+          ↑
+        </button>
+      )}
     </div>
   )
 } 
