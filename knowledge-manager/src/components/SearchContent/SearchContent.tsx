@@ -24,18 +24,32 @@ const SearchContent = () => {
     setResults(null);
 
     try {
-      const params = {
-        query: searchQuery,
-        collection: selectedCollection,
-        limit: 10
-      };
-      
-      const searchResults = await api.get<SearchResponseDTO>('search/single', {
-        ...params,
-        limit: params.limit.toString()
-      });
-      
-      setResults(searchResults);
+      if (selectedCollection === 'all') {
+        // For multi-collection search
+        const collections = ['articles_content', 'youtube_content', 'tutorial_sections'];
+        const params = {
+          query: searchQuery,
+          collections: collections.join(','),
+          limit_per_collection: '3'
+        };
+        
+        const searchResults = await api.get<SearchResponseDTO>('search/multi', params);
+        setResults(searchResults);
+      } else {
+        // For single collection search
+        const params = {
+          query: searchQuery,
+          collection: selectedCollection,
+          limit: 10
+        };
+        
+        const searchResults = await api.get<SearchResponseDTO>('search/single', {
+          ...params,
+          limit: params.limit.toString()
+        });
+        
+        setResults(searchResults);
+      }
     } catch (err) {
       setError('There was an error processing this request');
       console.error('Search error:', err);
