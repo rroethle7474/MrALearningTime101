@@ -16,6 +16,9 @@ function App() {
   const [url, setUrl] = useState('')
   const [inputType, setInputType] = useState<InputType>('article')
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isDocumentProcessing, setIsDocumentProcessing] = useState(false);
+  const [documentProcessingError, setDocumentProcessingError] = useState<string | null>(null);
+  const [documentProcessingSuccess, setDocumentProcessingSuccess] = useState(false);
   
   const {
     submitUrl,
@@ -58,12 +61,37 @@ function App() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
+      // Reset status messages when new file is selected
+      setDocumentProcessingError(null);
+      setDocumentProcessingSuccess(false);
     }
   };
 
-  const handleDocumentSubmit = (e: React.FormEvent) => {
+  const handleDocumentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Processing document:', selectedFile);
+    if (!selectedFile) return;
+
+    setIsDocumentProcessing(true);
+    setDocumentProcessingError(null);
+    setDocumentProcessingSuccess(false);
+
+    try {
+      // TODO: Replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+      
+      // Success case
+      setDocumentProcessingSuccess(true);
+      setSelectedFile(null);
+      if (e.target instanceof HTMLFormElement) {
+        e.target.reset(); // Clear the file input
+      }
+    } catch (err) {
+      // Error case
+      setDocumentProcessingError('Error while processing document');
+      console.error('Document processing error:', err);
+    } finally {
+      setIsDocumentProcessing(false);
+    }
   };
 
   return (
@@ -148,6 +176,7 @@ function App() {
                       id="document-upload"
                       accept=".txt,.pdf,.doc,.docx"
                       onChange={handleFileChange}
+                      disabled={isDocumentProcessing}
                     />
                     <p className="file-types-helper">
                       <i>Accepted file types: .txt, .pdf, .doc, .docx</i>
@@ -156,10 +185,18 @@ function App() {
                   <button 
                     type="submit" 
                     className="submit-button"
-                    disabled={!selectedFile}
+                    disabled={!selectedFile || isDocumentProcessing}
                   >
-                    Process Document
+                    {isDocumentProcessing ? 'Processing...' : 'Process Document'}
                   </button>
+                  
+                  {documentProcessingSuccess && (
+                    <p className="success-message">Document was processed successfully</p>
+                  )}
+                  
+                  {documentProcessingError && (
+                    <p className="error-message">{documentProcessingError}</p>
+                  )}
                 </form>
               </div>
 
