@@ -1,6 +1,6 @@
 // types/search.ts
 
-export type CollectionType = 'all' | 'articles_content' | 'youtube_content' | 'tiktok_content' | 'tutorial_sections';
+export type CollectionType = 'all' | 'articles_content' | 'youtube_content' | 'tutorials';
 
 export interface SearchResultDTO {
   id: string;
@@ -8,12 +8,13 @@ export interface SearchResultDTO {
   metadata: {
     title: string;
     source_url: string;
-    content_type: "article" | "youtube" | "tiktok";
+    content_type: "article" | "youtube" | "tutorial";
     summary?: string;
     author: string;
   };
-  relevanceScore: number;
+  distance: number;
 }
+
 
 export interface SearchResponseDTO {
   query: string;

@@ -6,8 +6,7 @@ import './SearchContent.css';
 const COLLECTIONS: { value: CollectionType; label: string }[] = [
   { value: 'all', label: 'All Collections' },
   { value: 'articles_content', label: 'Articles' },
-  { value: 'youtube_content', label: 'YouTube Content' },
-  { value: 'tutorial_sections', label: 'Tutorials' }
+  { value: 'youtube_content', label: 'YouTube Content' }
 ];
 
 const SearchContent = () => {
@@ -24,17 +23,17 @@ const SearchContent = () => {
     setResults(null);
 
     try {
+      let searchResults;
       if (selectedCollection === 'all') {
         // For multi-collection search
-        const collections = ['articles_content', 'youtube_content', 'tutorial_sections'];
+        const collections = ['articles_content', 'youtube_content'];
         const params = {
           query: searchQuery,
           collections: collections.join(','),
           limit_per_collection: '3'
         };
         
-        const searchResults = await api.get<SearchResponseDTO>('search/multi', params);
-        setResults(searchResults);
+        searchResults = await api.get<SearchResponseDTO>('search/multi', params);
       } else {
         // For single collection search
         const params = {
@@ -43,13 +42,15 @@ const SearchContent = () => {
           limit: 10
         };
         
-        const searchResults = await api.get<SearchResponseDTO>('search/single', {
+        searchResults = await api.get<SearchResponseDTO>('search/single', {
           ...params,
           limit: params.limit.toString()
         });
-        
-        setResults(searchResults);
       }
+      
+      // Sort results by distance (descending order - higher distance means higher relevance due to backend normalization)
+      searchResults.results.sort((a, b) => b.distance - a.distance);
+      setResults(searchResults);
     } catch (err) {
       setError('There was an error processing this request');
       console.error('Search error:', err);
@@ -62,7 +63,7 @@ const SearchContent = () => {
     <div className="container">
       <h1>Search Content</h1>
       <p className="description">
-        Search through your processed articles, videos, and tutorials
+        Search through your processed articles and videos.
       </p>
 
       <form onSubmit={handleSearch} className="input-form">
@@ -125,9 +126,8 @@ const SearchContent = () => {
                 </div>
                 <p className="result-content">{result.content}</p>
                 <div className="result-footer">
-                  <span className="result-author">By {result.metadata.author}</span>
                   <span className="result-score">
-                    Relevance: {(1 - result.relevanceScore).toFixed(2)}
+                    Relevance: {(result.distance).toFixed(2)}
                   </span>
                 </div>
               </div>

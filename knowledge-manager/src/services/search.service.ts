@@ -18,7 +18,7 @@ export const searchService = {
   },
 
   async searchMultiple(params: SearchParams): Promise<MultiCollectionSearchResponse> {
-    const collections = ['articles_content', 'youtube_content', 'tutorial_sections'];
+    const collections = ['articles_content', 'youtube_content', 'tutorials'];
     const queryParams = {
       query: params.query,
       collections: collections.join(','),
@@ -35,7 +35,7 @@ export const searchService = {
       // Flatten and sort results by relevance score
       const allResults = Object.values(multiResponse.collections)
         .flat()
-        .sort((a, b) => a.relevanceScore - b.relevanceScore);
+        .sort((a, b) => b.distance - a.distance);
       
       return {
         query: multiResponse.query,

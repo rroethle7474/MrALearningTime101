@@ -73,13 +73,17 @@ export const tutorialService = {
   },
 
   async getTutorialsList(offset: number = 0, limit: number = 50): Promise<TutorialListResponse> {
-    return api.get<TutorialListResponse>('tutorials', {
+    return api.get<TutorialListResponse>('tutorial/tutorials', {
       offset: offset.toString(),
       limit: limit.toString()
     });
   },
 
   async getTutorialDetail(tutorialId: string): Promise<TutorialResponse> {
-    return api.get<TutorialResponse>(`tutorials/${tutorialId}`);
+    return api.get<TutorialResponse>(`tutorial/tutorials/${tutorialId}`);
+  },
+
+  async deleteTutorial(tutorialId: string): Promise<void> {
+    await api.delete(`tutorial/tutorials/${tutorialId}`);
   }
 } 

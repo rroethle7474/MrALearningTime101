@@ -63,7 +63,7 @@ export function TutorialView({ tutorial }: TutorialViewProps) {
       <section id="additional-notes" className="tutorial-section">
         <h3>Additional Notes</h3>
         <div className="notes-content">
-          {tutorial.additionalNotes.map((note, index) => (
+          {tutorial.additionalNotes?.map((note, index) => (
             <p key={index}>{note}</p>
           ))}
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { tutorialService } from '../../services/tutorial.service';
 import { TutorialListItem, TutorialResponse } from '../../types/tutorial-list';
 import TutorialDetailModal from '../TutorialDetailModal/TutorialDetailModal';
@@ -18,15 +18,28 @@ const ExploreTutorial = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const PAGE_SIZE = 50;
 
+  // Add ref to track initial load
+  const initialLoadComplete = useRef(false);
+  
+  // Add ref for state values
+  const stateRef = useRef({ offset, loading, hasMore });
+  
+  // Update ref when state changes
+  useEffect(() => {
+    stateRef.current = { offset, loading, hasMore };
+  }, [offset, loading, hasMore]);
+
   const loadMoreTutorials = useCallback(async () => {
+    // Use ref values instead of state directly
+    const { loading, hasMore } = stateRef.current;
     if (loading || !hasMore) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      const response = await tutorialService.getTutorialsList(offset, PAGE_SIZE);
-      setHasMore(response.total > offset + PAGE_SIZE);
+      const response = await tutorialService.getTutorialsList(stateRef.current.offset, PAGE_SIZE);
+      setHasMore(response.total > stateRef.current.offset + PAGE_SIZE);
       setOffset(prev => prev + PAGE_SIZE);
       setTutorials(prev => [...prev, ...response.items]);
     } catch (err) {
@@ -35,26 +48,40 @@ const ExploreTutorial = () => {
     } finally {
       setLoading(false);
     }
-  }, [offset, loading, hasMore]);
+  }, []); // No dependencies needed anymore
 
+  // Update initial load effect
   useEffect(() => {
-    loadMoreTutorials();
+    if (!initialLoadComplete.current) {
+      initialLoadComplete.current = true;
+      loadMoreTutorials();
+    }
+  }, []); // Empty dependency array since we're using ref
+
+  // Update intersection observer cleanup
+  useEffect(() => {
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
   }, []);
 
   // Intersection Observer for infinite scroll
   const observer = React.useRef<IntersectionObserver>();
   const lastTutorialRef = useCallback((node: HTMLTableRowElement) => {
+    const { loading, hasMore } = stateRef.current;
     if (loading) return;
     if (observer.current) observer.current.disconnect();
     
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
+      if (entries[0].isIntersecting && stateRef.current.hasMore) {
         loadMoreTutorials();
       }
     });
 
     if (node) observer.current.observe(node);
-  }, [loading, hasMore, loadMoreTutorials]);
+  }, [loadMoreTutorials]); // Only depend on loadMoreTutorials
 
   const handleView = async (tutorialId: string) => {
     setIsModalLoading(true);
@@ -84,7 +111,7 @@ const ExploreTutorial = () => {
   
     setIsDeleting(true);
     try {
-      await collectionService.deleteContent('tutorials', tutorialToDelete.id);
+      await tutorialService.deleteTutorial(tutorialToDelete.id);
       
       // Remove tutorial from state
       setTutorials(prevTutorials => 
@@ -125,7 +152,6 @@ const ExploreTutorial = () => {
               <th>Description</th>
               <th>Source Type</th>
               <th>Sections</th>
-              <th>Difficulty</th>
               <th>Generated Date</th>
               <th className="actions-column">Actions</th>
             </tr>
@@ -133,7 +159,7 @@ const ExploreTutorial = () => {
           <tbody>
             {tutorials.length === 0 && !loading ? (
               <tr className="empty-row">
-                <td colSpan={7}>No tutorials found</td>
+                <td colSpan={6}>No tutorials found</td>
               </tr>
             ) : (
               tutorials.map((tutorial, index) => (
@@ -146,7 +172,6 @@ const ExploreTutorial = () => {
                   <td className="description-cell">{tutorial.description}</td>
                   <td>{tutorial.source_type}</td>
                   <td>{tutorial.section_count} sections</td>
-                  <td>{tutorial.metadata.difficulty_level || 'N/A'}</td>
                   <td>{new Date(tutorial.generated_date).toLocaleDateString()}</td>
                   <td className="actions-column">
                     <button 
@@ -154,6 +179,12 @@ const ExploreTutorial = () => {
                       onClick={() => handleView(tutorial.id)}
                     >
                       View
+                    </button>
+                    <button 
+                      className="action-button delete-button"
+                      onClick={() => handleDelete(tutorial)}
+                    >
+                      Delete
                     </button>
                   </td>
                 </tr>

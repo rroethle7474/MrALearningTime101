@@ -94,22 +94,6 @@ function App() {
                   >
                     YouTube
                   </button>
-                  <button
-                    type="button"
-                    className={`type-button ${inputType === 'tiktok' ? 'active' : ''}`}
-                    onClick={() => setInputType('tiktok')}
-                    disabled={isProcessing}
-                  >
-                    TikTok
-                  </button>
-                  <button
-                    type="button"
-                    className={`type-button ${inputType === 'package-tree' ? 'active' : ''}`}
-                    onClick={() => setInputType('package-tree')}
-                    disabled={isProcessing}
-                  >
-                    Package Tree
-                  </button>
                 </div>
 
                 <input

@@ -1,125 +1,212 @@
+/* Add/update container styles */
+.container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  overflow-x: hidden; /* Remove this if it exists */
+}
+
 .grid-container {
-    margin-top: 2rem;
-    overflow-x: auto;
+  margin-top: 2rem;
+  overflow-x: auto;
+  width: 100%;
+  padding-bottom: 1rem;
+  /* Add these properties */
+  position: relative;
+  max-width: 100%;
+}
+
+.tutorial-grid {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  table-layout: fixed;
+}
+
+.tutorial-grid th,
+.tutorial-grid td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Define specific column widths */
+.tutorial-grid th:nth-child(1), /* Title */
+.tutorial-grid td:nth-child(1) {
+  width: 25%;
+}
+
+.tutorial-grid th:nth-child(2), /* Description */
+.tutorial-grid td:nth-child(2) {
+  width: 35%;
+}
+
+.tutorial-grid th:nth-child(3), /* Source Type */
+.tutorial-grid td:nth-child(3) {
+  width: 12%;
+}
+
+.tutorial-grid th:nth-child(4), /* Sections */
+.tutorial-grid td:nth-child(4) {
+  width: 12%;
+}
+
+.tutorial-grid th:nth-child(5), /* Generated Date */
+.tutorial-grid td:nth-child(5) {
+  width: 12%;
+}
+
+/* Update action column styles */
+.tutorial-grid th:nth-child(6), /* Actions */
+.tutorial-grid td:nth-child(6) {
+  width: 200px; /* Increased from 120px to match ExploreContent */
+  min-width: 200px;
+  padding-right: 1rem;
+}
+
+.tutorial-grid th {
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.description-cell {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Update media query */
+@media (max-width: 768px) {
+  .container {
+    padding: 0;
+  }
+  
+  .grid-container {
+    margin: 1rem 0;
+    padding: 0;
   }
   
   .tutorial-grid {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 1rem;
+    min-width: 700px; /* Slightly smaller minimum width for mobile */
+  }
+  
+  .description-cell {
+    max-width: 150px;
   }
   
   .tutorial-grid th,
   .tutorial-grid td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .tutorial-grid th {
-    font-weight: 600;
-    background: rgba(0, 0, 0, 0.02);
-  }
-  
-  .description-cell {
-    max-width: 300px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .actions-column {
-    text-align: right;
-    white-space: nowrap;
-    width: 100px;
+    padding: 0.8rem;
+    font-size: 0.9rem;
   }
   
   .action-button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.2s;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
   }
-  
+}
+
+.actions-column {
+  text-align: right;
+  white-space: nowrap;
+  padding-right: 1rem !important;
+  width: 200px;
+  min-width: 200px;
+}
+
+.action-button {
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem; /* Add spacing between buttons */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.view-button {
+  background: #1a1a1a;
+  color: white;
+}
+
+.view-button:hover {
+  background: #333;
+}
+
+.delete-button {
+  background: #dc3545;
+  color: white;
+}
+
+.delete-button:hover {
+  background: #c82333;
+}
+
+.empty-row td {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 1rem;
+  color: #666;
+}
+
+.error-message {
+  padding: 1rem;
+  background: #ffebee;
+  color: #c62828;
+  border-radius: 4px;
+  margin: 1rem auto;
+  max-width: 500px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .tutorial-grid th {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .tutorial-grid th,
+  .tutorial-grid td {
+    border-bottom-color: #333;
+    color: #fff;
+  }
+
+  .empty-row td {
+    color: #888;
+  }
+
+  .loading-indicator {
+    color: #888;
+  }
+
+  .error-message {
+    background: rgba(198, 40, 40, 0.1);
+    color: #ff8a80;
+  }
+
   .view-button {
-    background: #1a1a1a;
-    color: white;
-  }
-  
-  .view-button:hover {
     background: #333;
   }
-  
-  .empty-row td {
-    text-align: center;
-    color: #666;
-    padding: 2rem;
+
+  .view-button:hover {
+    background: #444;
   }
-  
-  .loading-indicator {
-    text-align: center;
-    padding: 1rem;
-    color: #666;
+
+  .delete-button {
+    background: #dc3545;
   }
-  
-  .error-message {
-    padding: 1rem;
-    background: #ffebee;
-    color: #c62828;
-    border-radius: 4px;
-    margin: 1rem auto;
-    max-width: 500px;
+
+  .delete-button:hover {
+    background: #bd2130;
   }
-  
-  /* Dark mode support */
-  @media (prefers-color-scheme: dark) {
-    .tutorial-grid th {
-      background: rgba(255, 255, 255, 0.05);
-    }
-  
-    .tutorial-grid th,
-    .tutorial-grid td {
-      border-bottom-color: #333;
-      color: #fff;
-    }
-  
-    .empty-row td {
-      color: #888;
-    }
-  
-    .loading-indicator {
-      color: #888;
-    }
-  
-    .error-message {
-      background: rgba(198, 40, 40, 0.1);
-      color: #ff8a80;
-    }
-  
-    .view-button {
-      background: #333;
-    }
-  
-    .view-button:hover {
-      background: #444;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .description-cell {
-      max-width: 150px;
-    }
-    
-    .tutorial-grid th,
-    .tutorial-grid td {
-      padding: 0.8rem;
-      font-size: 0.9rem;
-    }
-    
-    .action-button {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.8rem;
-    }
-  }
+}
