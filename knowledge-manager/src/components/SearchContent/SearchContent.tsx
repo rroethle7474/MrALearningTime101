@@ -6,8 +6,10 @@ import './SearchContent.css';
 const COLLECTIONS: { value: CollectionType; label: string }[] = [
   { value: 'all', label: 'All Collections' },
   { value: 'articles_content', label: 'Articles' },
-  { value: 'youtube_content', label: 'YouTube Content' }
+  { value: 'youtube_content', label: 'YouTube Content' },
+  { value: 'notes', label: 'Documents' }
 ];
+
 
 const SearchContent = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,7 +28,7 @@ const SearchContent = () => {
       let searchResults;
       if (selectedCollection === 'all') {
         // For multi-collection search
-        const collections = ['articles_content', 'youtube_content', 'documents'];
+        const collections = ['articles_content', 'youtube_content', 'notes'];
         const params = {
           query: searchQuery,
           collections: collections.join(','),

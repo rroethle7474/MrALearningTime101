@@ -18,7 +18,7 @@ export const searchService = {
   },
 
   async searchMultiple(params: SearchParams): Promise<MultiCollectionSearchResponse> {
-    const collections = ['articles_content', 'youtube_content', 'tutorials'];
+    const collections = ['articles_content', 'youtube_content', 'tutorials', 'notes'];
     const queryParams = {
       query: params.query,
       collections: collections.join(','),
