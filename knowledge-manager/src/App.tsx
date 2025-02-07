@@ -39,8 +39,7 @@ function App() {
     submitDocument,
     isProcessing: isDocumentProcessing,
     error: documentError,
-    documentId,
-    processingStatus: documentProcessingStatus
+    documentId
   } = useDocumentSubmission();
 
   const getPlaceholderText = () => {
@@ -232,19 +231,15 @@ function App() {
                     className="submit-button"
                     disabled={!selectedFile || !documentTitle || isDocumentProcessing}
                   >
-                    {isDocumentProcessing ? 'Processing...' : 'Process Document'}
+                    {isDocumentProcessing ? 'Uploading...' : 'Upload Document'}
                   </button>
                   
                   {documentProcessingSuccess && (
-                    <p className="success-message">Document was processed successfully</p>
+                    <p className="success-message">Document was uploaded successfully</p>
                   )}
                   
                   {documentProcessingError && (
                     <p className="error-message">{documentProcessingError}</p>
-                  )}
-
-                  {isDocumentProcessing && documentProcessingStatus && (
-                    <p className="processing-status">{documentProcessingStatus}</p>
                   )}
                 </form>
               </div>

@@ -2,17 +2,9 @@ import { api } from '../api/client';
 import { config } from '../config/config'
 
 export interface DocumentSubmissionResponse {
-  task_id: string;
-  status: string;
-  document_id?: string;
+  document_id: string;
+  status: 'completed' | 'failed';
   error?: string;
-}
-
-export interface DocumentTaskResponse {
-  task_id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  document_id?: string;
-  message?: string;
 }
 
 export interface DocumentMetadata {
@@ -50,21 +42,15 @@ async function uploadFormData(endpoint: string, formData: FormData): Promise<Res
 export const documentService = {
   async submitDocument(formData: FormData): Promise<DocumentSubmissionResponse> {
     const response = await uploadFormData('document/upload', formData);
-    console.log('Document submission response:', response);
     const data = await response.json();
     
-    console.log('Raw document submission response:', data);
+    console.log('Document submission response:', data);
 
-    // If we get a failed status, throw an error immediately
     if (data.status === 'failed') {
       throw new Error(data.error || 'Document processing failed');
     }
     
     return data;
-  },
-
-  async getTaskStatus(taskId: string): Promise<DocumentTaskResponse> {
-    return api.get(`document/status/${taskId}`);
   },
 
   async getDocument(documentId: string): Promise<ProcessedDocument> {
