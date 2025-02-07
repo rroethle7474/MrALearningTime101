@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css'
 import { ProcessingStatus } from './components/ProcessingStatus'
@@ -9,6 +9,7 @@ import ExploreContent from './components/ExploreContent/ExploreContent';
 import PromptContent from './components/PromptContent/PromptContent';
 import ExploreTutorial from './components/ExploreTutorial/ExploreTutorial';
 import ExploreDocument from './components/ExploreDocument/ExploreDocument';
+import { useDocumentSubmission } from './hooks/useDocumentSubmission';
 
 type InputType = 'article' | 'youtube'
 
@@ -16,9 +17,10 @@ function App() {
   const [url, setUrl] = useState('')
   const [inputType, setInputType] = useState<InputType>('article')
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isDocumentProcessing, setIsDocumentProcessing] = useState(false);
   const [documentProcessingError, setDocumentProcessingError] = useState<string | null>(null);
   const [documentProcessingSuccess, setDocumentProcessingSuccess] = useState(false);
+  const [documentTitle, setDocumentTitle] = useState('');
+  const [documentTags, setDocumentTags] = useState('');
   
   const {
     submitUrl,
@@ -33,16 +35,20 @@ function App() {
     generateTutorial
   } = useUrlSubmission();
 
+  const {
+    submitDocument,
+    isProcessing: isDocumentProcessing,
+    error: documentError,
+    documentId,
+    processingStatus: documentProcessingStatus
+  } = useDocumentSubmission();
+
   const getPlaceholderText = () => {
     switch (inputType) {
       case 'article':
         return 'Enter article URL'
       case 'youtube':
         return 'Enter YouTube video URL'
-      case 'package-tree':
-        return 'Enter root URL to build knowledge tree'
-      case 'tiktok':
-        return 'Enter TikTok video URL'
     }
   }
 
@@ -69,30 +75,40 @@ function App() {
 
   const handleDocumentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFile) return;
-
-    setIsDocumentProcessing(true);
-    setDocumentProcessingError(null);
-    setDocumentProcessingSuccess(false);
+    if (!selectedFile || !documentTitle) return;
 
     try {
-      // TODO: Replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
-      
-      // Success case
-      setDocumentProcessingSuccess(true);
-      setSelectedFile(null);
-      if (e.target instanceof HTMLFormElement) {
-        e.target.reset(); // Clear the file input
+      const success = await submitDocument(
+        selectedFile,
+        documentTitle,
+        documentTags
+      );
+
+      if (success) {
+        setDocumentProcessingSuccess(true);
+        setSelectedFile(null);
+        setDocumentTitle('');
+        setDocumentTags('');
+        if (e.target instanceof HTMLFormElement) {
+          e.target.reset();
+        }
+      } else {
+        setDocumentProcessingError(documentError || 'Failed to process document');
       }
     } catch (err) {
-      // Error case
       setDocumentProcessingError('Error while processing document');
       console.error('Document processing error:', err);
-    } finally {
-      setIsDocumentProcessing(false);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      // Cleanup any pending operations when app unmounts
+      if (isDocumentProcessing) {
+        setDocumentProcessingError('Operation cancelled');
+      }
+    };
+  }, []);
 
   return (
     <Router>
@@ -182,10 +198,39 @@ function App() {
                       <i>Accepted file types: .txt, .pdf, .doc, .docx</i>
                     </p>
                   </div>
+
+                  <div className="text-input-container">
+                    <label htmlFor="document-title">Title *</label>
+                    <input
+                      type="text"
+                      id="document-title"
+                      value={documentTitle}
+                      onChange={(e) => setDocumentTitle(e.target.value)}
+                      placeholder="Enter document title"
+                      required
+                      disabled={isDocumentProcessing}
+                    />
+                  </div>
+
+                  <div className="text-input-container">
+                    <label htmlFor="document-tags">Tags</label>
+                    <input
+                      type="text"
+                      id="document-tags"
+                      value={documentTags}
+                      onChange={(e) => setDocumentTags(e.target.value)}
+                      placeholder="Enter tags, separated by commas"
+                      disabled={isDocumentProcessing}
+                    />
+                    <p className="tags-helper">
+                      <i>Optional: Separate tags with commas (e.g., research, science, paper)</i>
+                    </p>
+                  </div>
+
                   <button 
                     type="submit" 
                     className="submit-button"
-                    disabled={!selectedFile || isDocumentProcessing}
+                    disabled={!selectedFile || !documentTitle || isDocumentProcessing}
                   >
                     {isDocumentProcessing ? 'Processing...' : 'Process Document'}
                   </button>
@@ -196,6 +241,10 @@ function App() {
                   
                   {documentProcessingError && (
                     <p className="error-message">{documentProcessingError}</p>
+                  )}
+
+                  {isDocumentProcessing && documentProcessingStatus && (
+                    <p className="processing-status">{documentProcessingStatus}</p>
                   )}
                 </form>
               </div>

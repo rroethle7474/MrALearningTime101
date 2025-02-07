@@ -26,7 +26,7 @@ const SearchContent = () => {
       let searchResults;
       if (selectedCollection === 'all') {
         // For multi-collection search
-        const collections = ['articles_content', 'youtube_content'];
+        const collections = ['articles_content', 'youtube_content', 'documents'];
         const params = {
           query: searchQuery,
           collections: collections.join(','),
