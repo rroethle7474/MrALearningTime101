@@ -49,7 +49,7 @@ const SearchContent = () => {
           limit: params.limit.toString()
         });
       }
-      
+      console.log("SEARCH RESULTS", searchResults)
       // Sort results by distance (descending order - higher distance means higher relevance due to backend normalization)
       searchResults.results.sort((a, b) => b.distance - a.distance);
       setResults(searchResults);

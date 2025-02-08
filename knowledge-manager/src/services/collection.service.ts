@@ -1,10 +1,15 @@
 import { api } from '../api/client';
 import { MultiCollectionContentResponse } from '../types/collection';
 import { ContentDetailResponse } from '../types/content-detail';
+import { MultiCollectionDocumentResponse, DocumentDetailResponse } from '../types/document';
 
 const CONTENT_COLLECTIONS = [
   'articles_content',
   'youtube_content'
+];
+
+const DOCUMENT_COLLECTIONS = [
+  'notes'
 ];
 
 export const collectionService = {
@@ -35,5 +40,23 @@ export const collectionService = {
       }
       throw error;
     }
+  },
+
+  async getDocumentsContent(offset: number = 0, limit: number = 50): Promise<MultiCollectionDocumentResponse> {
+    const queryParams = {
+      collections: DOCUMENT_COLLECTIONS.join(','),
+      offset: offset.toString(),
+      limit: limit.toString()
+    };
+    
+    return api.get<MultiCollectionDocumentResponse>('search/documents/collections/contents', queryParams);
+  },
+
+  async getDocumentDetail(collectionName: string, documentId: string): Promise<DocumentDetailResponse> {
+    return api.get<DocumentDetailResponse>(`search/document/${collectionName}/${documentId}`);
+  },
+
+  async deleteDocument(collectionName: string, documentId: string): Promise<void> {
+    await api.delete(`search/document/${collectionName}/${documentId}`);
   }
 };
