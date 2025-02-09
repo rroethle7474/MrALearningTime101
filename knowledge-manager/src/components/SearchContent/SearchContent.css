@@ -132,3 +132,30 @@
       color: #888;
     }
   }
+  
+  /* Add these new styles */
+  .title-button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: #0066cc;
+    cursor: pointer;
+    text-align: left;
+    text-decoration: underline;
+  }
+  
+  .title-button:hover {
+    color: #0052a3;
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .title-button {
+      color: #66b3ff;
+    }
+  
+    .title-button:hover {
+      color: #99ccff;
+    }
+  }

@@ -39,6 +39,7 @@ const ExploreTutorial = () => {
 
     try {
       const response = await tutorialService.getTutorialsList(stateRef.current.offset, PAGE_SIZE);
+      console.log("RESPONSE", response)
       setHasMore(response.total > stateRef.current.offset + PAGE_SIZE);
       setOffset(prev => prev + PAGE_SIZE);
       setTutorials(prev => [...prev, ...response.items]);
@@ -89,6 +90,7 @@ const ExploreTutorial = () => {
     
     try {
       const tutorialDetail = await tutorialService.getTutorialDetail(tutorialId);
+      console.log('Tutorial detail:', tutorialDetail);
       setSelectedTutorial(tutorialDetail);
     } catch (err) {
       setModalError('Error loading tutorial details');
@@ -150,9 +152,9 @@ const ExploreTutorial = () => {
             <tr>
               <th>Title</th>
               <th>Description</th>
-              <th>Source Type</th>
+              <th>Type</th>
               <th>Sections</th>
-              <th>Generated Date</th>
+              <th>Date</th>
               <th className="actions-column">Actions</th>
             </tr>
           </thead>
@@ -168,7 +170,14 @@ const ExploreTutorial = () => {
                   ref={index === tutorials.length - 1 ? lastTutorialRef : undefined}
                   className="grid-row"
                 >
-                  <td>{tutorial.title}</td>
+                  <td> <a 
+                      href={tutorial.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="source-link"
+                    >
+                      {tutorial.title}
+                    </a></td>
                   <td className="description-cell">{tutorial.description}</td>
                   <td>{tutorial.source_type}</td>
                   <td>{tutorial.section_count} sections</td>

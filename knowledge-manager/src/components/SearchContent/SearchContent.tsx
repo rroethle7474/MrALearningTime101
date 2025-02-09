@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { api } from '../../api/client';
 import { SearchResponseDTO, CollectionType } from '../../types/search';
 import './SearchContent.css';
+import DocumentDetailModal from '../DocumentDetailModal/DocumentDetailModal';
+import { collectionService } from '../../services/collection.service';
+import { DocumentDetailResponse } from '../../types/document';
 
 const COLLECTIONS: { value: CollectionType; label: string }[] = [
   { value: 'all', label: 'All Collections' },
@@ -17,6 +20,9 @@ const SearchContent = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<SearchResponseDTO | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<DocumentDetailResponse | null>(null);
+  const [isModalLoading, setIsModalLoading] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,6 +58,7 @@ const SearchContent = () => {
       console.log("SEARCH RESULTS", searchResults)
       // Sort results by distance (descending order - higher distance means higher relevance due to backend normalization)
       searchResults.results.sort((a, b) => b.distance - a.distance);
+      console.log("SORTED RESULTS", searchResults)
       setResults(searchResults);
     } catch (err) {
       setError('There was an error processing this request');
@@ -59,6 +66,26 @@ const SearchContent = () => {
     } finally {
       setIsSearching(false);
     }
+  };
+
+  const handleViewDocument = async (id: string) => {
+    setIsModalLoading(true);
+    setModalError(null);
+    
+    try {
+      const documentDetail = await collectionService.getDocumentDetail('notes', id);
+      setSelectedDocument(documentDetail);
+    } catch (err) {
+      setModalError('Error loading document details');
+      console.error('Error:', err);
+    } finally {
+      setIsModalLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setSelectedDocument(null);
+    setModalError(null);
   };
 
   return (
@@ -116,14 +143,23 @@ const SearchContent = () => {
             results.results.map((result, index) => (
               <div key={result.id || index} className="result-item">
                 <div className="result-header">
-                  <a
-                    href={result.metadata.source_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="source-link"
-                  >
-                    {result.metadata.title || 'Untitled Content'}
-                  </a>
+                  {result.metadata.content_type === 'notes' ? (
+                    <button
+                      onClick={() => handleViewDocument(result.id)}
+                      className="title-button"
+                    >
+                      {result.metadata.title || 'Untitled Content'}
+                    </button>
+                  ) : (
+                    <a
+                      href={result.metadata.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="source-link"
+                    >
+                      {result.metadata.title || 'Untitled Content'}
+                    </a>
+                  )}
                   <span className="result-type">{result.metadata.content_type}</span>
                 </div>
                 <p className="result-content">{result.content}</p>
@@ -137,6 +173,13 @@ const SearchContent = () => {
           )}
         </div>
       )}
+
+      <DocumentDetailModal
+        document={selectedDocument}
+        onClose={handleCloseModal}
+        isLoading={isModalLoading}
+        error={modalError}
+      />
     </div>
   );
 };

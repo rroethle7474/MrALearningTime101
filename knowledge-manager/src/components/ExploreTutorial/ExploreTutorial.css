@@ -39,6 +39,8 @@
 .tutorial-grid th:nth-child(1), /* Title */
 .tutorial-grid td:nth-child(1) {
   width: 25%;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Break long words if needed */
 }
 
 .tutorial-grid th:nth-child(2), /* Description */
@@ -209,4 +211,19 @@
   .delete-button:hover {
     background: #bd2130;
   }
+}
+
+/* Update the base td styles to allow specific columns to override */
+.tutorial-grid td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Remove white-space: nowrap from here */
+}
+
+/* Add specific white-space: nowrap for other columns that should stay single line */
+.tutorial-grid td:not(:first-child) {
+  white-space: nowrap;
 }

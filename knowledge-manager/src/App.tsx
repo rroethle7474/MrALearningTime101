@@ -92,7 +92,7 @@ function App() {
           e.target.reset();
         }
       } else {
-        setDocumentProcessingError(documentError || 'Failed to process document');
+        setDocumentProcessingError(documentError || 'An unexpected error occurred');
       }
     } catch (err) {
       setDocumentProcessingError('Error while processing document');
@@ -170,6 +170,10 @@ function App() {
                 >
                   {isProcessing ? 'Processing...' : 'Process Content'}
                 </button>
+
+                {error && (
+                  <p className="error-message">{error}</p>
+                )}
 
                 <ProcessingStatus 
                   isProcessing={isProcessing}

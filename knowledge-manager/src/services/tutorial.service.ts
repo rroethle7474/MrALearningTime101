@@ -85,5 +85,15 @@ export const tutorialService = {
 
   async deleteTutorial(tutorialId: string): Promise<void> {
     await api.delete(`tutorial/tutorials/${tutorialId}`);
+  },
+
+  async deleteTutorialByContentId(contentId: string): Promise<void> {
+    await api.delete(`tutorial/tutorials/content/${contentId}`);
+  },
+
+  async deleteTutorialByUrl(sourceUrl: string): Promise<void> {
+    // URL encode the source URL to handle special characters
+    const encodedUrl = encodeURIComponent(sourceUrl);
+    await api.delete(`tutorial/tutorials/url?source_url=${encodedUrl}`);
   }
 } 

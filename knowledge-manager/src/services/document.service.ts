@@ -33,7 +33,8 @@ async function uploadFormData(endpoint: string, formData: FormData): Promise<Res
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.message || 'Request failed');
+    console.log('Error response:', error.error);
+    throw new Error(error.error || error.message || 'Request failed');
   }
 
   return response;
@@ -41,16 +42,29 @@ async function uploadFormData(endpoint: string, formData: FormData): Promise<Res
 
 export const documentService = {
   async submitDocument(formData: FormData): Promise<DocumentSubmissionResponse> {
-    const response = await uploadFormData('document/upload', formData);
-    const data = await response.json();
-    
-    console.log('Document submission response:', data);
+    try {
+      const response = await uploadFormData('document/upload', formData);
+      const data = await response.json();
+      
+      console.log('Document submission response:', data);
 
-    if (data.status === 'failed') {
-      throw new Error(data.error || 'Document processing failed');
+      if (data.status === 'failed') {
+        throw new Error(data.error || 'Document processing failed');
+      }
+      
+      return data;
+    } catch (err) {
+      // If the error is from our API and has a structured response
+      console.log('Error:', err);
+      if (err instanceof Error && 'response' in err) {
+        const response = (err as any).response;
+        if (response?.data?.error) {
+          throw new Error(response.data.error);
+        }
+      }
+      // Re-throw the original error if it's not a structured API error
+      throw err;
     }
-    
-    return data;
   },
 
   async getDocument(documentId: string): Promise<ProcessedDocument> {

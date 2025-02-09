@@ -162,14 +162,36 @@ export function useUrlSubmission(): UseUrlSubmissionResult {
     
     try {
       const safe_url = url.trim();
+      
+      // Validate URL based on content type
+      if (type === 'article' && safe_url.toLowerCase().includes('youtube')) {
+        throw new Error('YouTube links should be processed using the YouTube tab');
+      }
+      if (type === 'youtube' && !safe_url.toLowerCase().includes('youtube')) {
+        throw new Error('This URL does not appear to be a YouTube link');
+      }
+
       const collectionName = type === 'youtube' ? 'youtube_content' : 'articles_content';
       
       // Check if content already exists
       const existingContent = await collectionService.checkContentExists(collectionName, safe_url);
       
       if (existingContent?.exists) {
-        console.log('Content already exists, deleting before reprocessing:', existingContent.content_id);
-        await collectionService.deleteContent(collectionName, existingContent.content_id);
+        console.log('Content already exists, attempting to delete before reprocessing:', existingContent.content_id);
+        
+        try {
+          await collectionService.deleteContent(collectionName, existingContent.content_id);
+          console.log("Content deleted successfully");
+        } catch (err) {
+          console.warn("Failed to delete existing content, continuing anyway:", err);
+        }
+
+        try {
+          await tutorialService.deleteTutorialByUrl(safe_url);
+          console.log("Tutorial deleted by URL successfully");
+        } catch (err) {
+          console.warn("Failed to delete existing tutorial, continuing anyway:", err);
+        }
       }
 
       // Continue with normal submission process

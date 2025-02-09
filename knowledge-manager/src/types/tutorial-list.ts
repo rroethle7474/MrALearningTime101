@@ -4,6 +4,7 @@ export interface TutorialListItem {
     id: string;
     title: string;
     description: string;
+    source_url: string;
     generated_date: string;
     source_type: "article" | "youtube";
     section_count: number;

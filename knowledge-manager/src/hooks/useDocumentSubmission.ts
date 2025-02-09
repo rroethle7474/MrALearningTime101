@@ -40,11 +40,15 @@ export const useDocumentSubmission = (): UseDocumentSubmissionResult => {
         return true;
       }
       
+      setError(response.error || 'Failed to process document');
       return false;
     } catch (err) {
       console.error('Document submission failed:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to process document';
-      setError(errorMessage);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred while processing the document');
+      }
       return false;
     } finally {
       setIsProcessing(false);
