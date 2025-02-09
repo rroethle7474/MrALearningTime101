@@ -3,6 +3,7 @@ import { collectionService } from '../../services/collection.service';
 import { DocumentListItem, DocumentGridItem, DocumentDetailResponse, FileType } from '../../types/document';
 import DocumentDetailModal from '../DocumentDetailModal/DocumentDetailModal';
 import DeleteConfirmationModal from '../DeleteConfirmationModal/DeleteConfirmationModal';
+import { documentService } from '../../services/document.service';
 import './ExploreDocument.css';
 
 const ExploreDocument = () => {
@@ -134,6 +135,15 @@ const ExploreDocument = () => {
     return type.toUpperCase();
   };
 
+  const handleDownload = async (id: string) => {
+    try {
+      await documentService.downloadDocument(id);
+    } catch (err) {
+      // Error is already handled in the service
+      console.error('Download error:', err);
+    }
+  };
+
   return (
     <div className="container">
       <h1>Explore Documents</h1>
@@ -180,6 +190,12 @@ const ExploreDocument = () => {
                       onClick={() => handleView(item.id)}
                     >
                       View
+                    </button>
+                    <button 
+                      className="action-button download-button"
+                      onClick={() => handleDownload(item.id)}
+                    >
+                      Download
                     </button>
                     <button 
                       className="action-button delete-button"

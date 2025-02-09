@@ -80,5 +80,70 @@ export const documentService = {
       query,
       limit: limit.toString(),
     });
-  }
+  },
+
+  async downloadDocument(documentId: string): Promise<void> {
+    try {
+      const response = await fetch(`${config.apiUrl}/api/document/${documentId}/download`);
+      
+      if (!response.ok) {
+        throw new Error('File not available for download');
+      }
+
+      const blob = await response.blob();
+      let filename = 'document';
+      
+      // Try to get filename from Content-Disposition header
+      const contentDisposition = response.headers.get('content-disposition') || 
+                               response.headers.get('Content-Disposition');
+      console.log("CONTENT DISPOSITION", contentDisposition)
+      if (contentDisposition) {
+        const filenameMatch = /filename=(?:(['"])(.*?)\1|([^'"][^;]*))/.exec(contentDisposition);
+        if (filenameMatch) {
+
+          filename = filenameMatch[2] || filenameMatch[3];
+        }
+      } else {
+        // Fallback: Try to get filename from URL
+        const urlParts = response.url.split('/');
+        const lastPart = urlParts[urlParts.length - 1];
+        if (lastPart && lastPart !== 'download') {
+          filename = decodeURIComponent(lastPart);
+        }
+      }
+
+      // Ensure we have a file extension
+      if (!filename.includes('.')) {
+        const contentType = response.headers.get('content-type');
+        if (contentType === 'application/octet-stream') {
+          filename += '.pdf';
+        } else {
+          const extensionMap: { [key: string]: string } = {
+            'application/pdf': '.pdf',
+            'text/plain': '.txt',
+            'application/msword': '.doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+            'text/markdown': '.md'
+          };
+          const extension = extensionMap[contentType] || '';
+          if (extension) {
+            filename += extension;
+          }
+        }
+      }
+
+      // Create a download link and trigger it
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      alert('No source file available to download');
+      throw err;
+    }
+  },
 }; 

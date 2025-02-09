@@ -36,6 +36,7 @@ async function apiRequest(endpoint: string, options: RequestOptions = {}) {
   const apiPath = `/api/${normalizedEndpoint}`
   
   const url = new URL(`${config.apiUrl}${apiPath}`)
+  console.log("URL", url)
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
       url.searchParams.append(key, value)

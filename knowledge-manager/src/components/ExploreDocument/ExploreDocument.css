@@ -76,6 +76,15 @@
   max-width: 600px;
 }
 
+.download-button {
+  background: #28a745;
+  color: white;
+}
+
+.download-button:hover {
+  background: #218838;
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .content-grid th {
@@ -114,5 +123,13 @@
   .error-message {
     background: rgba(198, 40, 40, 0.1);
     color: #ff8a80;
+  }
+
+  .download-button {
+    background: #28a745;
+  }
+
+  .download-button:hover {
+    background: #1e7e34;
   }
 }
